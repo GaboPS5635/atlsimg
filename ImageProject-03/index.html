@@ -1,15 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"> </script>
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+    <script>
+      AFRAME.registerComponent("float-spin", {
+        schema: {
+          spin: { type: "number", default: 30 },     
+          hover: { type: "number", default: 0.3 },  
+          orbit: { type: "number", default: 0.5 },   
+          speed: { type: "number", default: 1 },     
+          offset: { type: "number", default: 0 }     
+        },
+        init() {
+          const p = this.el.object3D.position;
+          this.center = { x: p.x, y: p.y, z: p.z };
+          this.t = 0;
+        },
+        tick(t, dt) {
+          this.t += dt * 0.001 * this.data.speed;
+          const { spin, hover, orbit, offset } = this.data;
+          const obj = this.el.object3D;
+
+          obj.rotation.y += (spin * Math.PI / 180) * (dt / 1000); 
+
+          const y = this.center.y + Math.sin(this.t + offset) * hover;
+          const x = this.center.x + Math.cos(this.t + offset) * orbit;
+          const z = this.center.z + Math.sin(this.t + offset) * orbit;
+
+          obj.position.set(x, y, z);
+        }
+      });
+
+    </script>
   </head>
   <body>
     <a-scene>
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-      <a-sky color="#ECECEC"></a-sky>
+
+      <a-plane
+        src="./assets/top-view-artificial-grass-soccer-field-background-texture.jpg" rotation="-90 0 0" width="60" height="60"  repeat="60 60" color="#7BC8A4">
+      </a-plane>
+
+      <a-entity
+        gltf-model="./assets/Chill Guy.glb" position="-2 1 -4" scale="0.5 0.5 0.5" float-spin="spin: 40; hover: 0.4; orbit: 0.8; speed: 1; offset: 0"> </a-entity>
+
+      <a-entity gltf-model="./assets/frog.glb" position="2 0.6 -4" scale="0.2 0.2 0.2" float-spin="spin: 30; hover: 0.4; orbit: 0.9; speed: 1; offset: 1.5"> </a-entity> 
+
+      <a-sky src="assets/skyr.png"></a-sky>
     </a-scene>
   </body>
 </html>
